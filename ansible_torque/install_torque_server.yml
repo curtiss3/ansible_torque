@@ -32,8 +32,25 @@
       command: make
       args:
         chdir: /root/torque-6.1.0
-#        creates: /root/torque-6.1.0/config.status
+        creates: /root/torque-6.1.0/make_success
 
+    - name: test if make worked
+      command: touch make_success
+      args:
+        chdir: /root/torque-6.1.0
+        creates: /root/torque-6.1.0/make_success
+
+    - name: run make install
+      command: make install
+      args:
+        chdir: /root/torque-6.1.0
+        creates: /root/torque-6.1.0/make_install_success
+
+    - name: test if make install worked
+      command: touch make_install_success
+      args:
+        chdir: /root/torque-6.1.0
+        creates: /root/torque-6.1.0/make_install_success
 
     # download torque
     # extract

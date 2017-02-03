@@ -11,7 +11,7 @@ Vagrant.configure("2") do |config|
     vb.cpus = 2
     vb.memory = 4096
   end
-  
+
   # The most common configuration options are documented and commented below.
   # For a complete reference, please see the online documentation at
   # https://docs.vagrantup.com.
