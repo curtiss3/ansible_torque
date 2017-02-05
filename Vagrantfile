@@ -12,6 +12,9 @@ Vagrant.configure("2") do |config|
     vb.memory = 4096
   end
 
+  # configure hostname
+  config.vm.hostname = "master"
+
   # The most common configuration options are documented and commented below.
   # For a complete reference, please see the online documentation at
   # https://docs.vagrantup.com.
