@@ -16,11 +16,15 @@
         - 'hwloc'
         - 'hwloc-devel'
 
-    - name: download and extract torque
-      unarchive:
-        src: http://wpfilebase.s3.amazonaws.com/torque/torque-6.1.0.tar.gz
-        dest: /root
-        remote_src: True
+    - pip:
+        name: pexpect
+
+# TODO put in test to see if this step already done
+#    - name: download and extract torque
+#      unarchive:
+#        src: http://wpfilebase.s3.amazonaws.com/torque/torque-6.1.0.tar.gz
+#        dest: /root
+#        remote_src: True
 
     - name: run configure
       command: ./configure --enable-cgroups --with-momlogdir
@@ -52,8 +56,38 @@
         chdir: /root/torque-6.1.0
         creates: /root/torque-6.1.0/make_install_success
 
-    # download torque
-    # extract
-    # install packages related to rpmbuild
-    # build torque rpm
-    # scp to file server
+    - name: create hwloc config file
+      command: touch /etc/ld.so.conf.d/hwloc.conf
+      args:
+        creates: /etc/ld.so.conf.d/hwloc.conf
+
+    - name: configure hwloc
+      lineinfile:
+        dest: /etc/ld.so.conf.d/hwloc.conf
+        line: '/usr/local/lib'
+
+    - name: run ldconfig
+      command: ldconfig
+
+# TODO the hostnamne given by the hostname command, must be the first entry in the /etc/hosts for 127.0.0.1
+
+
+    - name: initial server db
+      expect:
+        command: ./torque.setup root
+        responses:
+          (?i)wish: "y"
+      args:
+        chdir: /root/torque-6.1.0
+      environment:
+        PATH: "{{ ansible_env.PATH }}:/usr/local/bin:/usr/local/sbin"
+
+# echo /usr/local/lib >/etc/ld.so.conf.d/hwloc.conf
+
+#test torque server
+#download maui
+#uncompress maui
+#configure maui
+#make maui
+#make install maui
+#test maui
