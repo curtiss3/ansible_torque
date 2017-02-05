@@ -90,7 +90,20 @@
         chdir: /root/torque-6.1.0
         creates: /root/torque-6.1.0/initial_server_db_success
 
-# echo /usr/local/lib >/etc/ld.so.conf.d/hwloc.conf
+    - name: enable and start pbs_server
+      systemd:
+        name: pbs_server.service
+        state: started
+        enabled: True
+
+    - name: run make packages
+      command: make packages
+      args:
+        chdir: /root/torque-6.1.0
+        creates: /root/torque-6.1.0/make_packages_success
+
+# TODO test run make packages
+# TODO packages going to wrong folder
 
 #test torque server
 #download maui
