@@ -80,8 +80,15 @@
           (?i)wish: "y"
       args:
         chdir: /root/torque-6.1.0
+        creates: /root/torque-6.1.0/initial_server_db_success
       environment:
         PATH: "{{ ansible_env.PATH }}:/usr/local/bin:/usr/local/sbin"
+
+    - name: create file to show server db initialize worked
+      command: touch initial_server_db_success
+      args:
+        chdir: /root/torque-6.1.0
+        creates: /root/torque-6.1.0/initial_server_db_success
 
 # echo /usr/local/lib >/etc/ld.so.conf.d/hwloc.conf
 
