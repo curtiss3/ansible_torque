@@ -1,6 +1,6 @@
 ---
 # http://docs.adaptivecomputing.com/torque/6-1-0/adminGuide/help.htm
-- hosts: localhost
+- hosts: master
   tasks:
 
     - name: install packages for building torque
@@ -12,6 +12,7 @@
         - 'boost-devel'
         - 'hwloc'
         - 'hwloc-devel'
+        - 'sshpass'
 
     - pip:
         name: pexpect
@@ -103,6 +104,36 @@
         chdir: /root/torque-6.1.0
         creates: /root/torque-6.1.0/torque-package-devel-linux-x86_64.sh
 
+- hosts: nodes
+  tasks:
+
+    - name: install dependencies for mom client
+      yum:
+        name: "{{ item }}"
+        state: installed
+      with_items:
+        - 'libcgroup-tools'
+      become: yes
+      become_user: root
+
+    - name: copy MOM file to clients
+      copy:
+        src: /root/torque-6.1.0/torque-package-mom-linux-x86_64.sh
+        dest: /tmp/torque-package-mom-linux-x86_64.sh
+        mode: 0755
+
+    - name: copy mom service unit file
+      copy:
+        src: /root/torque-6.1.0/contrib/systemd/pbs_mom.service
+        dest: /usr/lib/systemd/system/pbs_mom.service
+        mode: 0644
+      become: yes
+      become_user: root
+
+    - name: run mom client install
+      command: ./torque-package-mom-linux-x86_64.sh --install
+      args:
+        chdir: /tmp
 
 #test torque server
 #download maui

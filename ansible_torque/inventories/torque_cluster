@@ -1,0 +1,10 @@
+[master]
+localhost ansible_connection=local
+
+[nodes]
+192.168.50.5
+
+[nodes:vars]
+ansible_connection=ssh
+ansible_ssh_user=vagrant
+ansible_ssh_pass=vagrant
