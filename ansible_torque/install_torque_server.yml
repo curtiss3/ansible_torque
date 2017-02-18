@@ -1,4 +1,5 @@
 ---
+# http://docs.adaptivecomputing.com/torque/6-1-0/adminGuide/help.htm
 - hosts: localhost
   tasks:
 
@@ -19,7 +20,7 @@
       get_url:
         url: http://wpfilebase.s3.amazonaws.com/torque/torque-6.1.0.tar.gz
         dest: /root/torque-6.1.0.tar.gz
-        checksum: sha256:c93585f024720df3e3e360eeb25df4990a9ed85362ac3e7adec6c7a13f8e62d2
+        checksum: sha256:ae7f0d06d274a1b9d7f9cf378ef518699e347a0d48122658f737f1f31ca4938e
 
     - name: extract torque
       unarchive:
@@ -96,14 +97,12 @@
         state: started
         enabled: True
 
-    - name: run make packages
+    - name: (2.2.5) run make packages
       command: make packages
       args:
         chdir: /root/torque-6.1.0
-        creates: /root/torque-6.1.0/make_packages_success
+        creates: /root/torque-6.1.0/torque-package-devel-linux-x86_64.sh
 
-# TODO test run make packages
-# TODO packages going to wrong folder
 
 #test torque server
 #download maui
