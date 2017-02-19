@@ -106,13 +106,23 @@
 
 - hosts: nodes
   tasks:
-
+    # review if needed, hwloc needed.
     - name: install dependencies for mom client
       yum:
         name: "{{ item }}"
         state: installed
       with_items:
         - 'libcgroup-tools'
+        - 'hwloc'
+        - 'hwloc-devel'
+        - 'libxml2-devel'
+        - 'boost-devel'
+        - 'openssl-devel'
+        - 'gcc'
+        - 'gcc-c++'
+        - 'libgcc'
+        - 'numactl-libs'
+        - 'xz-devel'
       become: yes
       become_user: root
 
@@ -134,6 +144,52 @@
       command: ./torque-package-mom-linux-x86_64.sh --install
       args:
         chdir: /tmp
+      become: yes
+      become_user: root
+
+    - name: fix security violation in /var/spool/torque
+      file:
+        path: /var/spool/torque
+        recurse: yes
+        state: directory
+        owner: root
+        group: root
+        mode: "0755" # must be quoted or DOOM (octal vs dec)
+      become: yes
+      become_user: root
+
+    - name: fix security violation in /var/spool/torque
+      file:
+        path: "{{ item }}"
+        recurse: no
+        state: directory
+        owner: root
+        group: root
+        mode: "1777" # must be quoted or DOOM (octal vs dec)
+      become: yes
+      become_user: root
+      with_items:
+        - '/var/spool/torque/spool'
+        - '/var/spool/torque/undelivered'
+
+# TODO: add log file arguement to /usr/lib/systemd/system/pbs_mom.service
+#   -L /var/spool/torque/mom_logs/test.log
+
+
+    - name: restart mom client
+      command:  systemctl restart pbs_mom.service
+      become: yes
+      become_user: root
+
+    - name: status mom client
+      command:  systemctl status pbs_mom.service
+      become: yes
+      become_user: root
+      register: mom_status
+
+    - debug: msg="{{mom_status.stdout}}"
+
+
 
 #test torque server
 #download maui
