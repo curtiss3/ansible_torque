@@ -2,6 +2,13 @@
 # http://docs.adaptivecomputing.com/torque/6-1-0/adminGuide/help.htm
 - hosts: master
   tasks:
+    - name: configure hosts file
+      lineinfile:
+        dest: /etc/hosts
+        line: '192.168.50.5 client1'
+        create: yes
+      become: yes
+      become_user: root
 
     - name: install packages for building torque
       yum:
@@ -104,9 +111,30 @@
         chdir: /root/torque-6.1.0
         creates: /root/torque-6.1.0/torque-package-devel-linux-x86_64.sh
 
+    - name: configure nodes
+      lineinfile:
+        dest: /var/spool/torque/server_priv/nodes
+        line: 'client1 np=1 client1'
+        create: yes
+      become: yes
+      become_user: root
+
+    - name: enable and start pbs_server
+      systemd:
+        name: pbs_server.service
+        state: restarted
+        enabled: True
+
 - hosts: nodes
   tasks:
-    # review if needed, hwloc needed.
+    - name: configure hosts file
+      lineinfile:
+        dest: /etc/hosts
+        line: '192.168.50.4 master'
+        create: yes
+      become: yes
+      become_user: root
+    # review if all these dependencies needed. hwloc, libcgroup-tools needed.
     - name: install dependencies for mom client
       yum:
         name: "{{ item }}"
@@ -172,9 +200,32 @@
         - '/var/spool/torque/spool'
         - '/var/spool/torque/undelivered'
 
-# TODO: add log file arguement to /usr/lib/systemd/system/pbs_mom.service
-#   -L /var/spool/torque/mom_logs/test.log
+    - name: configure mom
+      lineinfile:
+        dest: /var/spool/torque/mom_priv/config
+        regexp: '^\$pbsserver'
+        line: '$pbsserver master'
+        create: yes
+      become: yes
+      become_user: root
 
+    - name: add log file arguement to /usr/lib/systemd/system/pbs_mom.service
+      lineinfile:
+        dest: /usr/lib/systemd/system/pbs_mom.service
+        regexp: '^ExecStart='
+        line: 'ExecStart=/usr/local/sbin/pbs_mom -F -d $PBS_HOME $PBS_ARGS -L /var/spool/torque/mom_logs/pbs_mom.log'
+      become: yes
+      become_user: root
+
+    - name: reload units
+      command:  systemctl daemon-reload
+      become: yes
+      become_user: root
+
+    - name: enable pbs_mom service
+      command:  systemctl enable pbs_mom.service
+      become: yes
+      become_user: root
 
     - name: restart mom client
       command:  systemctl restart pbs_mom.service
