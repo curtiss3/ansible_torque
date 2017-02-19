@@ -249,3 +249,7 @@
 #make maui
 #make install maui
 #test maui
+#dhcpd on master for pxe of clients
+#fix master to client known hosts issue
+#fix systemd enable trqauthd
+#fix pbs_server does not start on first boot
