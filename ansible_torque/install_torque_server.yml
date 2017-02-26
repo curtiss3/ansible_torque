@@ -159,6 +159,7 @@
         src: /root/torque-6.1.0/torque-package-mom-linux-x86_64.sh
         dest: /tmp/torque-package-mom-linux-x86_64.sh
         mode: 0755
+        remote_src: true
 
     - name: copy mom service unit file
       copy:
@@ -240,7 +241,8 @@
 
     - debug: msg="{{mom_status.stdout}}"
 
-
+# TODO: remove ansible from master in vagrant file
+# TODO: increase resources to VM's in vagrant file
 
 #test torque server
 #download maui
