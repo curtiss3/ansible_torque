@@ -92,3 +92,6 @@ ENV/
 /.idea/
 /.vagrant/
 *.retry
+ssh.cfg
+ansible_torque/inventories/*
+ansible_torque/tpackages
