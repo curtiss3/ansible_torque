@@ -14,6 +14,7 @@ Vagrant.configure("2") do |config|
 
     master.vm.box = "bento/centos-7.3"
 
+    # this installs ansible
     master.vm.provision "shell", inline: <<-SHELL
       yum install -y epel-release
       yum install -y python-pip
